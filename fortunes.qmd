@@ -3,9 +3,6 @@ title: "Fortunes"
 author: "lvaudor"
 format: html
 editor: visual
-project:
-  type: website
-  output-dir: docs
 execute:
   cache: true
 ---
