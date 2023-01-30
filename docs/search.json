@@ -1,42 +1,42 @@
 [
   {
-    "objectID": "business_fortunes.html",
-    "href": "business_fortunes.html",
+    "objectID": "report.html",
+    "href": "report.html",
     "title": "Fortunes",
     "section": "",
     "text": "library(tidyverse)\n\n── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──\n✔ ggplot2 3.4.0      ✔ purrr   0.3.5 \n✔ tibble  3.1.8      ✔ dplyr   1.0.10\n✔ tidyr   1.2.1      ✔ stringr 1.5.0 \n✔ readr   2.1.3      ✔ forcats 0.5.2 \n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\n\nlibrary(glitter)"
   },
   {
-    "objectID": "business_fortunes.html#a-partir-des-propriétés-de-litem-amazon",
-    "href": "business_fortunes.html#a-partir-des-propriétés-de-litem-amazon",
+    "objectID": "report.html#a-partir-des-propriétés-de-litem-amazon",
+    "href": "report.html#a-partir-des-propriétés-de-litem-amazon",
     "title": "Fortunes",
     "section": "A partir des propriétés de l’item “Amazon”",
     "text": "A partir des propriétés de l’item “Amazon”\nOn s’inspire des données renseignées pour l’item Amazon pour identifier les descripteurs qui nous intéressent…\n\nWikidataR::find_item(\"Amazon\")\n\n\n    Wikidata item search\n\nNumber of results:   10 \n\nResults:\n1    Amazon (Q3884) - American multinational technology company \n2    Amazon (Q3783) - river in South America \n3    Amazons (Q134154) - warrior women from Greek mythology \n4    Mary Celeste (Q33209) - Ship found abandoned in the Atlantic Ocean in 1872 \n5    Amazon (Q456065) - interactive fiction computer game with graphics \n6    Amazon (Q771908) - 2000 film by Philippe de Broca \n7    amazon (Q647433) - fairy chess piece that can move like a queen or a knight \n8    Amazonas (Q40040) - state in the North Region of Brazil \n9    Amazon (Q688422) - syndicated television show created by Peter Benchley \n10   Amazon rainforest (Q177567) - rainforest in South America \n\nAmazon_claims=glitter::get_claims(\"wd:Q3884\")\n\nL’item doit être de type (P31)\n\nQ4830453 business\nQ6881511 enterprise\nLes propriétés qui peuvent nous intéresser:\nP2137 total equity\nP2139 total revenue\nP2295 net profit\nP2403 total assets\nP3362 operating income\nP159 headquarters location\nP154 logo image\nP17 country"
   },
   {
-    "objectID": "business_fortunes.html#formulation-et-envoi-de-la-requête",
-    "href": "business_fortunes.html#formulation-et-envoi-de-la-requête",
+    "objectID": "report.html#formulation-et-envoi-de-la-requête",
+    "href": "report.html#formulation-et-envoi-de-la-requête",
     "title": "Fortunes",
     "section": "Formulation et envoi de la requête",
     "text": "Formulation et envoi de la requête\n\ntib_fortunes=spq_init() %>% \n  #entreprise a pour revenu ?total_revenue\n  spq_add(\"?enterprise p:P2139 ?r\", .label=\"?enterprise\") %>%\n  spq_add(\"?r ps:P2139 ?total_revenue\") %>% \n  #total_revenue vaut pour la date ?total_revenue_date\n  spq_add(\"?r pq:P585 ?total_revenue_date\") %>% \n  #entreprise a pour profit net ?net_profit\n  spq_add(\"?enterprise wdt:P2295 ?net_profit\", .required=FALSE) %>% \n  #?entreprise a pour actifs totaux ?total_assets\n  spq_add(\"?enterprise wdt:P2403 ?total_assets\", .required=FALSE) %>%\n  #?entreprise a pour résultat d'exploitation ?operating_income\n  spq_add(\"?enterprise wdt:P3362 ?operating_income\", .required=FALSE) %>% \n  #?entreprise a pour pays ?country\n  spq_add(\"?enterprise wdt:P17 ?country\", .label=\"?country\",) %>% \n  #?entreprise est de type \"business\" ou \"enterprise\"\n  spq_filter(enterprise==wdt::P31(types)) %>%\n  spq_set(types = c(\"wd:Q4830453\",\"wd:Q6881511\")) %>% \n  #?entreprise est localisée à ?headquarters \n  spq_add(\"?enterprise wdt:P159 ?headquarters\",\n          .label=\"?headquarters\",.required=FALSE) %>% \n  #?enterprise a pour coordonnées géographiques ?enterprise_loc\n  spq_add(\"?enterprise wdt:P625 ?enterprise_loc\",.required=FALSE) %>%  \n  spq_perform()\n\ndim(tib_fortunes)\n\n[1] 32267    14"
   },
   {
-    "objectID": "business_fortunes.html#rajoute-les-localisations-des-headquarters-si-localisation-de-lentreprise-non-renseignée",
-    "href": "business_fortunes.html#rajoute-les-localisations-des-headquarters-si-localisation-de-lentreprise-non-renseignée",
+    "objectID": "report.html#rajoute-les-localisations-des-headquarters-si-localisation-de-lentreprise-non-renseignée",
+    "href": "report.html#rajoute-les-localisations-des-headquarters-si-localisation-de-lentreprise-non-renseignée",
     "title": "Fortunes",
     "section": "Rajoute les localisations des headquarters si localisation de l’entreprise non renseignée",
     "text": "Rajoute les localisations des headquarters si localisation de l’entreprise non renseignée\n\ntib_headquarters=tib_fortunes %>% \n  filter(is.na(enterprise_loc)) %>% \n  clean_wikidata_table() %>% \n  group_by(headquarters, headquartersLabel) %>% \n  summarise(n=n()) %>% \n  arrange(desc(n)) %>% \n  na.omit() %>%\n  ungroup() %>% \n  mutate(n=1:n(),\n         ntot=n(),\n         p=n/ntot) %>% \n  mutate(slice=cut(p,seq(0,1,by=0.05))) %>% \n  group_by(slice) %>% \n  nest() \n\n`summarise()` has grouped output by 'headquarters'. You can override using the\n`.groups` argument.\n\ngetloc=function(data){\n  list_headquarters=data$headquarters\n  tib=spq_init() %>% \n    spq_add(\"?headquarters wdt:P625 ?headquarters_loc\") %>% \n    spq_set(headquarters=list_headquarters) %>% \n    spq_perform()\n  return(tib)\n}\ntib_headquarters=tib_headquarters %>% \n  mutate(data=purrr::map(data,getloc)) %>% \n  unnest(cols=data) %>% \n  ungroup() %>% \n  select(-slice) %>% \n  clean_wikidata_table()\n\ntib_fortunes=tib_fortunes %>% \n   left_join(tib_headquarters,by=\"headquarters\")"
   },
   {
-    "objectID": "business_fortunes.html#exporte-la-table",
-    "href": "business_fortunes.html#exporte-la-table",
+    "objectID": "report.html#exporte-la-table",
+    "href": "report.html#exporte-la-table",
     "title": "Fortunes",
     "section": "Exporte la table",
     "text": "Exporte la table\n\ntib_fortunes=tib_fortunes %>%\n  mutate(total_revenue_year=lubridate::year(total_revenue_date))\n\ntib_fortunes_export=tib_fortunes %>% \n  select(enterprise=enterpriseLabel,\n         total_revenue,\n         total_revenue_date,\n         net_profit,\n         total_assets,\n         operating_income,\n         country=countryLabel,\n         headquarters=headquartersLabel,\n         enterprise_loc)\nwrite.csv2(tib_fortunes_export,\"data/fortunes.csv\")"
   },
   {
-    "objectID": "business_fortunes.html#combien-dentreprises-aux-usa",
-    "href": "business_fortunes.html#combien-dentreprises-aux-usa",
+    "objectID": "report.html#combien-dentreprises-aux-usa",
+    "href": "report.html#combien-dentreprises-aux-usa",
     "title": "Fortunes",
     "section": "Combien d’entreprises aux USA?",
     "text": "Combien d’entreprises aux USA?\n\ntib_fortunes_USA=tib_fortunes %>% \n  filter(total_revenue_year>2020,\n         countryLabel==\"United States of America\") %>%\n  group_by(enterprise,enterpriseLabel) %>% \n  summarise(mean_revenue=mean(total_revenue)) %>% \n  arrange(desc(mean_revenue))\n\n`summarise()` has grouped output by 'enterprise'. You can override using the\n`.groups` argument."

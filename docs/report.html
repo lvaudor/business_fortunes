@@ -159,7 +159,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<div class="cell" data-hash="business_fortunes_cache/html/setup_53c4dba1e083fda713fd6b4a83004149">
+<div class="cell" data-hash="report_cache/html/setup_313d70027ea0028e40a3cb100b7cb003">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
@@ -178,7 +178,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="a-partir-des-propriétés-de-litem-amazon" class="level2">
 <h2 class="anchored" data-anchor-id="a-partir-des-propriétés-de-litem-amazon">A partir des propriétés de l’item “Amazon”</h2>
 <p>On s’inspire des données renseignées pour l’item Amazon pour identifier les descripteurs qui nous intéressent…</p>
-<div class="cell" data-hash="business_fortunes_cache/html/explore_Amazon_1cfe08822755cbd62a51a42913b11887">
+<div class="cell" data-hash="report_cache/html/explore_Amazon_5ab651ae5627cf17eaf55fb1cb902d66">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>WikidataR<span class="sc">::</span><span class="fu">find_item</span>(<span class="st">"Amazon"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -217,7 +217,7 @@ Results:
 </section>
 <section id="formulation-et-envoi-de-la-requête" class="level2">
 <h2 class="anchored" data-anchor-id="formulation-et-envoi-de-la-requête">Formulation et envoi de la requête</h2>
-<div class="cell" data-hash="business_fortunes_cache/html/query_1ceee939306161ed1e66543209fcfc8d">
+<div class="cell" data-hash="report_cache/html/query_dd0b06ccd66f0d43aa65eec13e081f7a">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tib_fortunes<span class="ot">=</span><span class="fu">spq_init</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">#entreprise a pour revenu ?total_revenue</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spq_add</span>(<span class="st">"?enterprise p:P2139 ?r"</span>, <span class="at">.label=</span><span class="st">"?enterprise"</span>) <span class="sc">%&gt;%</span></span>
@@ -250,7 +250,7 @@ Results:
 </section>
 <section id="rajoute-les-localisations-des-headquarters-si-localisation-de-lentreprise-non-renseignée" class="level2">
 <h2 class="anchored" data-anchor-id="rajoute-les-localisations-des-headquarters-si-localisation-de-lentreprise-non-renseignée">Rajoute les localisations des headquarters si localisation de l’entreprise non renseignée</h2>
-<div class="cell" data-hash="business_fortunes_cache/html/tib_headquarters_b39decc61b60e32d2c2524f6845a49e7">
+<div class="cell" data-hash="report_cache/html/tib_headquarters_1a4de811dd667707c88f7d1ae3098589">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tib_headquarters<span class="ot">=</span>tib_fortunes <span class="sc">%&gt;%</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(enterprise_loc)) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_wikidata_table</span>() <span class="sc">%&gt;%</span> </span>
@@ -290,7 +290,7 @@ Results:
 </section>
 <section id="exporte-la-table" class="level2">
 <h2 class="anchored" data-anchor-id="exporte-la-table">Exporte la table</h2>
-<div class="cell" data-hash="business_fortunes_cache/html/unnamed-chunk-1_1c6d19a6ab5f8e945ec4ad9b9d38b43b">
+<div class="cell" data-hash="report_cache/html/unnamed-chunk-1_ad3819bc6360dbca01714fda22eaeb61">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tib_fortunes<span class="ot">=</span>tib_fortunes <span class="sc">%&gt;%</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_revenue_year=</span>lubridate<span class="sc">::</span><span class="fu">year</span>(total_revenue_date))</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -312,7 +312,7 @@ Results:
 <h1>Exhaustivité/qualité des données</h1>
 <section id="combien-dentreprises-aux-usa" class="level2">
 <h2 class="anchored" data-anchor-id="combien-dentreprises-aux-usa">Combien d’entreprises aux USA?</h2>
-<div class="cell" data-hash="business_fortunes_cache/html/enterprise_USA_384f4d1b2ef8c874a450681a19f21a35">
+<div class="cell" data-hash="report_cache/html/enterprise_USA_8a97882a2db1621504031ac11789676f">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tib_fortunes_USA<span class="ot">=</span>tib_fortunes <span class="sc">%&gt;%</span> </span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(total_revenue_year<span class="sc">&gt;</span><span class="dv">2020</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>         countryLabel<span class="sc">==</span><span class="st">"United States of America"</span>) <span class="sc">%&gt;%</span></span>

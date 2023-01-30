@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-fortunes_cache
-fortunes_files
+report_cache
 
 /.quarto/
