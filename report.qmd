@@ -12,10 +12,6 @@ library(tidyverse)
 library(glitter)
 ```
 
-# Construction de la requête Wikidata
-
-## A partir des propriétés de l'item "Amazon"
-
 On s'inspire des données renseignées pour l'item Amazon pour identifier les descripteurs qui nous intéressent...
 
 ```{r explore_Amazon}
@@ -112,6 +108,7 @@ tib_headquarters=tib_headquarters %>%
   clean_wikidata_table()
 
 tib_fortunes=tib_fortunes %>% 
+   clean_wikidata_table() %>% 
    left_join(tib_headquarters,by="headquarters")
 
 ```
@@ -120,18 +117,20 @@ tib_fortunes=tib_fortunes %>%
 
 ```{r}
 tib_fortunes=tib_fortunes %>%
-  mutate(total_revenue_year=lubridate::year(total_revenue_date))
+  mutate(total_revenue_year=lubridate::year(total_revenue_date),
+         headquarters_loc=case_when(!is.na(enterprise_loc)~enterprise_loc,
+                                    TRUE~headquarters_loc))
 
 tib_fortunes_export=tib_fortunes %>% 
   select(enterprise=enterpriseLabel,
          total_revenue,
-         total_revenue_date,
+         total_revenue_year,
          net_profit,
          total_assets,
          operating_income,
          country=countryLabel,
          headquarters=headquartersLabel,
-         enterprise_loc)
+         headquarters_loc)
 write.csv2(tib_fortunes_export,"data/fortunes.csv")
 ```
 
@@ -140,11 +139,25 @@ write.csv2(tib_fortunes_export,"data/fortunes.csv")
 ## Combien d'entreprises aux USA?
 
 ```{r enterprise_USA}
+tib_fortunes=read.csv2("data/fortunes.csv") %>% 
+  transform_wikidata_coords("headquarters_loc",prefix="headquarters_")
 tib_fortunes_USA=tib_fortunes %>% 
-  filter(total_revenue_year>2020,
-         countryLabel=="United States of America") %>%
-  group_by(enterprise,enterpriseLabel) %>% 
-  summarise(mean_revenue=mean(total_revenue)) %>% 
-  arrange(desc(mean_revenue))
+  filter(country=="United States of America") %>%
+  group_by(enterprise,total_revenue_year,headquarters_lat,headquarters_lng) %>% 
+  summarise(total_revenue=unique(total_revenue)) %>% 
+  ungroup() %>% 
+  select(enterprise,total_revenue,total_revenue_year,headquarters_lat, headquarters_lng) %>% 
+  tidyr::pivot_wider(names_from=total_revenue_year,
+                     values_from=total_revenue,
+                     names_prefix="year_") %>% 
+  arrange(desc(year_2022)) %>% 
+  select(enterprise,
+         headquarters_lat, headquarters_lng,
+         year_2019,
+         year_2020,
+         year_2021,
+         year_2022)
+
+reactable::reactable(tib_fortunes_USA)
   
 ```
